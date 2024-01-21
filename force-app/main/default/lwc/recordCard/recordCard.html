@@ -1,0 +1,30 @@
+<template>
+    <div if:true={recordToShow} class="slds-box slds-box_x-small slds-var-m-top_x-small">
+        <div>
+            <h3 class="slds-text-heading_small">
+                {recordToShow.type}
+            </h3>
+        </div>
+
+        <div class="slds-var-p-top_small">
+            <ul>
+                <template for:each={recordToShow.fields} for:item="field">
+                    <li key={field.label}>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col slds-size_1-of-4">
+                                <div class="slds-text-title">
+                                    {field.label}
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_3-of-4">
+                                <div class="slds-text-body_regular">
+                                    {field.value}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </div>
+</template>

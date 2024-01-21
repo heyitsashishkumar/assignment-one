@@ -12,4 +12,18 @@ public with sharing class CRMSearch {
 
         return JSON.serializePretty(searchResp);
     }
+
+    @AuraEnabled(cacheable=true)
+    public static String fetchRecord(String recordId, String recordType) {
+        SObject record;
+        if (recordType == 'Contact') {
+            record = [SELECT Id, Name, Email FROM Contact WHERE Id = :recordId];
+        } else if (recordType == 'Lead') {
+            record = [SELECT Id, Name, Email, Company FROM Lead WHERE Id = :recordId];
+        } else if (recordType == 'Account') {
+            record = [SELECT Id, Name, Website, Industry FROM Account WHERE Id = :recordId];
+        }
+
+        return JSON.serializePretty(record);
+    }
 }

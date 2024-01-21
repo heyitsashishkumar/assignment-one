@@ -1,9 +1,14 @@
 import { LightningElement } from 'lwc';
+import Toast from 'lightning/toast';
 import search from '@salesforce/apex/CRMSearch.search';
 
 export default class CrmPicklist extends LightningElement {
     searchResults = [];
+    selectedRecords = [];
     showDropdown = false;
+    showLoadingSpinner = false;
+    noRecordsFound = false;
+
 
     handleChange(event) {
         let searchInput = event.target.value;
@@ -20,10 +25,34 @@ export default class CrmPicklist extends LightningElement {
 
     handleSelect(event) {
         console.log('Selected Record: ' + JSON.stringify(event.currentTarget.dataset));
+        // Its like this: {"id":"00Q1y000004DWBAEA4","type":"Lead"}
+
+        // Check if this record exists in selectedRecords
+        let exists = false;
+        this.selectedRecords.forEach(record => {
+            if (record.id === event.currentTarget.dataset.id) {
+                exists = true;
+            }
+        });
+
+        if (!exists) {
+            this.selectedRecords = [...this.selectedRecords, event.currentTarget.dataset];
+        } else {
+            Toast.show({
+                label: "Record already selected",
+                message: "This record is already selected",
+                variant: "warning"
+            });
+        }
+
+        this.showDropdown = false;
     }
 
     async handleSearch(searchInput) {
         try {
+            this.showLoadingSpinner = true;
+            this.showDropdown = true;
+            this.noRecordsFound = false;
             let records = (JSON.parse(await search({ searchKey: searchInput }))).flat();
 
             let searchedRecords = [];
@@ -49,7 +78,11 @@ export default class CrmPicklist extends LightningElement {
             });
 
             this.searchResults = searchedRecords;
-            this.showDropdown = true;
+            this.showLoadingSpinner = false;
+
+            if (this.searchResults.length === 0) {
+                this.noRecordsFound = true;
+            }
         } catch (error) {
             console.log('Error: ' + error);
         }
