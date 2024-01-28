@@ -1,9 +1,16 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import fetchRecord from '@salesforce/apex/CRMSearch.fetchRecord';
+
+// Import message service features required for publishing and the message channel
+import { publish, MessageContext } from 'lightning/messageService';
+import RECORD_SELECTED_CHANNEL from '@salesforce/messageChannel/Record_Selected__c';
 
 export default class RecordCard extends LightningElement {
     @api selectedRecord;
     recordToShow;
+
+    @wire(MessageContext)
+    messageContext;
 
     connectedCallback() {
         console.log('Selected Record in child: ' + JSON.stringify(this.selectedRecord));
@@ -37,11 +44,23 @@ export default class RecordCard extends LightningElement {
             this.recordToShow = {
                 fields: fields,
                 type: recordType,
-                icon: `standard:${recordType.toLowerCase()}`
+                icon: `standard:${recordType.toLowerCase()}`,
+                recordId: recordId
             };
 
         } catch (error) {
             console.log('Error: ' + JSON.stringify(error));
         }
+    }
+
+    handleRecordSelect(event) {
+        const recordId = event.currentTarget.dataset.id;
+        const recordType = event.currentTarget.dataset.type;
+        console.log('Record Id: ' + recordId);
+        console.log('Record Type: ' + recordType);
+
+        // Publish the message to the message channel
+        const payload = { recordId, recordType };
+        publish(this.messageContext, RECORD_SELECTED_CHANNEL, payload);
     }
 }

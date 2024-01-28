@@ -1,5 +1,5 @@
 <template>
-    <div if:true={recordToShow} class="slds-box slds-box_x-small slds-var-m-top_x-small">
+    <div if:true={recordToShow} class="slds-box slds-box_x-small slds-var-m-top_x-small" onclick={handleRecordSelect} data-id={recordToShow.recordId} data-type={recordToShow.type}>
         <div>
             <h3 class="slds-text-heading_small">
                 {recordToShow.type}
