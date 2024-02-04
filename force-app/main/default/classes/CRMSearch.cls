@@ -1,6 +1,6 @@
 public with sharing class CRMSearch {
     
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static String search(String searchKey) {
         String searchTerm = searchKey + '*';
 
@@ -13,7 +13,7 @@ public with sharing class CRMSearch {
         return JSON.serializePretty(searchResp);
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static String fetchRecord(String recordId, String recordType) {
         SObject record;
         if (recordType == 'Contact') {
@@ -27,7 +27,7 @@ public with sharing class CRMSearch {
         return JSON.serializePretty(record);
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static String fetchRecordAddress(String recordId, String recordType) {
         System.debug(recordId);
         System.debug(recordType);
@@ -88,7 +88,6 @@ public with sharing class CRMSearch {
     }
 
     private static String fetchGeolocation(String address) {
-
         String url = 'https://api.geoapify.com/v1/geocode/search?text=' + EncodingUtil.urlEncode(address, 'UTF-8') + '&apiKey=81177a9a30f24a3fa78163f2cb9d5e8b';
 
         Http http = new Http();
@@ -104,6 +103,33 @@ public with sharing class CRMSearch {
             System.debug('The status code returned was not expected: ' + response.getStatusCode() + ' ' + response.getStatus());
             return '';
         }
+    }
 
+    @AuraEnabled
+    public static string fetchNearbyPlaces(
+        String radius,
+        String[] categories,
+        String lat,
+        String lon
+    ) {
+        String url = 'https://api.geoapify.com/v2/places?categories=' + String.join(categories, ',') + '&limit=20&filter=circle:' + lon + ',' + lat + ',' + radius + '&apiKey=81177a9a30f24a3fa78163f2cb9d5e8b';
+        System.debug(url);
+
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(url);
+        request.setMethod('GET');
+
+        HttpResponse response = http.send(request);
+
+        if (response.getStatusCode() == 200){
+            PlacesWrapper obj = new PlacesWrapper();
+            obj = (PlacesWrapper)JSON.deserialize(response.getBody(), PlacesWrapper.class);
+
+            return JSON.serializePretty(obj);
+        } else {
+            System.debug('The status code returned was not expected: ' + response.getStatusCode() + ' ' + response.getStatus());
+            return '';
+        }
     }
 }

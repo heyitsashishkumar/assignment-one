@@ -1,9 +1,12 @@
 <template>
     <div if:true={recordToShow} class="slds-box slds-box_x-small slds-var-m-top_x-small" onclick={handleRecordSelect} data-id={recordToShow.recordId} data-type={recordToShow.type}>
-        <div>
-            <h3 class="slds-text-heading_small">
+        <div class="slds-grid slds-grid_align-spread">
+            <h3 class="slds-col slds-text-heading_small">
                 {recordToShow.type}
             </h3>
+            <span class="slds-col">
+                <lightning-icon icon-name="utility:close" size="xx-small" alternative-text="Close" title="Close" onclick={handleClose}></lightning-icon>
+            </span>
         </div>
 
         <div class="slds-var-p-top_small">

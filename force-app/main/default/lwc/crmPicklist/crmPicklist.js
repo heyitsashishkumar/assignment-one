@@ -4,7 +4,7 @@ import search from '@salesforce/apex/CRMSearch.search';
 
 export default class CrmPicklist extends LightningElement {
     searchResults = [];
-    selectedRecords = [];
+    selectedRecord;
     showDropdown = false;
     showLoadingSpinner = false;
     noRecordsFound = false;
@@ -26,25 +26,7 @@ export default class CrmPicklist extends LightningElement {
     handleSelect(event) {
         console.log('Selected Record: ' + JSON.stringify(event.currentTarget.dataset));
         // Its like this: {"id":"00Q1y000004DWBAEA4","type":"Lead"}
-
-        // Check if this record exists in selectedRecords
-        let exists = false;
-        this.selectedRecords.forEach(record => {
-            if (record.id === event.currentTarget.dataset.id) {
-                exists = true;
-            }
-        });
-
-        if (!exists) {
-            this.selectedRecords = [...this.selectedRecords, event.currentTarget.dataset];
-        } else {
-            Toast.show({
-                label: "Record already selected",
-                message: "This record is already selected",
-                variant: "warning"
-            });
-        }
-
+        this.selectedRecord = event.currentTarget.dataset;
         this.showDropdown = false;
     }
 
@@ -86,5 +68,9 @@ export default class CrmPicklist extends LightningElement {
         } catch (error) {
             console.log('Error: ' + error);
         }
+    }
+
+    handleRecordClose() {
+        this.selectedRecord = undefined;
     }
 }

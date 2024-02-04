@@ -63,4 +63,9 @@ export default class RecordCard extends LightningElement {
         const payload = { recordId, recordType };
         publish(this.messageContext, RECORD_SELECTED_CHANNEL, payload);
     }
+
+    handleClose() {
+        const event = new CustomEvent('close');
+        this.dispatchEvent(event);
+    }
 }
